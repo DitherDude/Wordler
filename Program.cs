@@ -195,6 +195,8 @@ namespace Wordler
                 {
                     wordbank.Where(x => x.Key[i].Equals(guess.Key[i])).ToList()
                         .ForEach(kvp => wordbank.Remove(kvp.Key));
+                    wordbank.Where(x => !x.Key.Contains(guess.Key[i])).ToList()
+                        .ForEach(kvp => wordbank.Remove(kvp.Key));
                     somewhere = somewhere + guess.Key[i];
                 }
                 else if (result[i] == '0')
