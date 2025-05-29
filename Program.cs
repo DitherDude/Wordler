@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Numerics;
 using System.Xml;
 
@@ -103,20 +104,29 @@ namespace Wordler
                         }
                         used = used + myguess[i];
                     }
-                };
+                }
+                ;
                 wordbank[myguess] = score;
-            };
+            }
+            ;
             Console.WriteLine("Sorting Dictionary...");
             wordbank = wordbank.OrderByDescending(x => x.Value)
                 .ToDictionary(x => x.Key, x => x.Value);
             Guess();
         }
-        static void Guess()
+        static void Guess(string input = "")
         {
             KeyValuePair<string, int> guess = new KeyValuePair<string, int>("", 0);
             try
             {
-                guess = wordbank.First();
+                if (wordbank.ContainsKey(input) && input != "")
+                {
+                    guess = wordbank.Where(x => x.Key == input).First();
+                }
+                else
+                {
+                    guess = wordbank.First();
+                }
             }
             catch
             {
@@ -152,11 +162,6 @@ namespace Wordler
                     SaveWeights();
                     continue;
                 }
-                if (result?.Length != maxlen)
-                {
-                    Console.WriteLine("Invalid length.");
-                    continue;
-                }
                 bool invalid = false;
                 foreach (char c in result)
                 {
@@ -167,7 +172,28 @@ namespace Wordler
                 }
                 if (invalid)
                 {
+                    if (result == "@list")
+                    {
+                        Console.WriteLine("========================");
+                        foreach (KeyValuePair<string, int> word in wordbank)
+                        {
+                            Console.WriteLine($"Word: {word.Key} | Guess score: {Math.Round(word.Value * 100 / (double)wordbank.Sum(x => x.Value), 2)}% | Guess value: {word.Value}");
+                        }
+                        Console.WriteLine("========================");
+                        Guess();
+                        return;
+                    }
+                    else if (wordbank.ContainsKey(result) && result != "")
+                    {
+                        Guess(result);
+                        return;
+                    }
                     Console.WriteLine("Invalid result.");
+                    continue;
+                }
+                if (result?.Length != maxlen)
+                {
+                    Console.WriteLine("Invalid length.");
                     continue;
                 }
                 ok = true;
@@ -175,6 +201,7 @@ namespace Wordler
             if (result.All(c => c == '2'))
             {
                 Main(ogargs);
+                return;
             }
             Console.WriteLine("Removing Redundancies...");
             wordbank.Remove(guess.Key);
