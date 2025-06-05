@@ -174,14 +174,16 @@ namespace Wordler
                 }
                 if (invalid)
                 {
+                    int len = wordbank.First().Key.Length;
+                    int countlen = wordbank.First().Value.ToString().Length;
                     if (result == "@list")
                     {
-                        Console.WriteLine("========================");
+                        Console.WriteLine(printLine(len, countlen));
                         foreach (KeyValuePair<string, int> word in wordbank)
                         {
-                            Console.WriteLine($"Word: {word.Key} | Guess score: {Math.Round(word.Value * 100 / (double)wordbank.Sum(x => x.Value), 2)}% | Guess value: {word.Value}");
+                            Console.WriteLine($"Word: {word.Key} | Guess score: {Math.Round(word.Value * 100 / (double)wordbank.Sum(x => x.Value), 2).ToString("F2")}% | Guess value: {word.Value}");
                         }
-                        Console.WriteLine("========================");
+                        Console.WriteLine(printLine(len, countlen));
                         Guess();
                         return;
                     }
@@ -189,13 +191,13 @@ namespace Wordler
                     {
                         int head = 0;
                         int.TryParse(result.Replace("@list", ""), out head);
-                        Console.WriteLine("========================");
+                        Console.WriteLine(printLine(len, countlen));
                         for (int i = 0; i < head && i < wordbank.Count(); i++)
                         {
                             KeyValuePair<string, int> word = wordbank.ElementAt(i);
-                            Console.WriteLine($"Word: {word.Key} | Guess score: {Math.Round(word.Value * 100 / (double)wordbank.Sum(x => x.Value), 2)}% | Guess value: {word.Value}");
+                            Console.WriteLine($"Word: {word.Key} | Guess score: {Math.Round(word.Value * 100 / (double)wordbank.Sum(x => x.Value), 2).ToString("F2")}% | Guess value: {word.Value}");
                         }
-                        Console.WriteLine("========================");
+                        Console.WriteLine(printLine(len, countlen));
                         Guess();
                         return;
                     }
@@ -302,6 +304,20 @@ namespace Wordler
             }
             File.WriteAllText("sortedinput.txt", data);
             Console.WriteLine($"Current sorted wordbank state saved to {Environment.CurrentDirectory}\\sortedinput.txt");
+        }
+        static string printLine(int length, int scorelength)
+        {
+            string line = "=======";
+            for (int i = 0; i < length; i++)
+            {
+                line += "=";
+            }
+            line += "|====================|==============";
+            for (int i = 0; i < scorelength; i++)
+            {
+                line += "=";
+            }
+            return line;
         }
     }
 }
