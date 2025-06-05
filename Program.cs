@@ -78,10 +78,11 @@ namespace Wordler
         }
         static void CalculateWeights()
         {
-            Console.WriteLine("Weighing Data...");
+            Console.Write("Weighing Data... ");
             wordbank.Where(word => !somewhere.All(letter => word.Key.Contains(letter)))
                 .ToList().ForEach(kvp => wordbank.Remove(kvp.Key));
             somewhere = "";
+            int index = 0;
             foreach (string myguess in wordbank.Keys)
             {
                 int score = 0;
@@ -105,10 +106,11 @@ namespace Wordler
                         used = used + myguess[i];
                     }
                 }
-                ;
                 wordbank[myguess] = score;
+                Console.Write($"\rWeighing Data... ({Math.Round(index * 100 / (double)wordbank.Count())}%)");
+                index++;
             }
-            ;
+            Console.WriteLine("\rWeighing Data... Done. ");
             Console.WriteLine("Sorting Dictionary...");
             wordbank = wordbank.OrderByDescending(x => x.Value)
                 .ToDictionary(x => x.Key, x => x.Value);
@@ -177,6 +179,20 @@ namespace Wordler
                         Console.WriteLine("========================");
                         foreach (KeyValuePair<string, int> word in wordbank)
                         {
+                            Console.WriteLine($"Word: {word.Key} | Guess score: {Math.Round(word.Value * 100 / (double)wordbank.Sum(x => x.Value), 2)}% | Guess value: {word.Value}");
+                        }
+                        Console.WriteLine("========================");
+                        Guess();
+                        return;
+                    }
+                    else if (result.StartsWith("@list"))
+                    {
+                        int head = 0;
+                        int.TryParse(result.Replace("@list", ""), out head);
+                        Console.WriteLine("========================");
+                        for (int i = 0; i < head && i < wordbank.Count(); i++)
+                        {
+                            KeyValuePair<string, int> word = wordbank.ElementAt(i);
                             Console.WriteLine($"Word: {word.Key} | Guess score: {Math.Round(word.Value * 100 / (double)wordbank.Sum(x => x.Value), 2)}% | Guess value: {word.Value}");
                         }
                         Console.WriteLine("========================");
